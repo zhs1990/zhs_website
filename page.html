@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>分页展示</title>
+<style>
+*{ margin:0; padding:0; list-style:none;}
+body{ width:100%; height:100%; text-align:center;}
+#ul1{ width:366px; margin:100px auto;}
+#ul1 li{ width:100px; height:100px; margin:10px; float:left; background:#ccc; border:1px solid #000; text-align:center; line-height:100px; font-size:20px; color:#f00;}
+input{margin:20px auto;}
+</style>
+<script src="js/move.js"></script>
+<script>
+window.onload=function(){
+	var oBtn=document.getElementById('btn1');
+	var oUl=document.getElementById('ul1');
+	var aLi=oUl.children;
+	
+	//布局转化
+	var aPos=[];
+	var bS = false;
+	for(var i=0; i<aLi.length; i++){
+		aPos[i]={left:aLi[i].offsetLeft, top:aLi[i].offsetTop};
+	}
+	
+	for(var i=0; i<aLi.length; i++){
+		aLi[i].style.left=aPos[i].left+'px';
+		aLi[i].style.top=aPos[i].top+'px';
+		aLi[i].style.position='absolute';
+		aLi[i].style.margin=0;
+	}
+	
+	//点击
+	var timer=null;
+	oBtn.onclick=function(){
+		if(bS==true){
+			clearInterval(timer);
+		}
+		bS=true;
+		var i=0;
+		
+		timer=setInterval(function(){
+			(function(index){
+				bS=false;
+				move(aLi[i],{width:0,height:0, opacity:0, left:0, top:0},{end:function(){
+					if(index==aLi.length-1){
+						for(var i=0; i<aLi.length; i++){
+							aLi[i].style.background='rgb('+parseInt(Math.random()*256)+','+parseInt(Math.random()*256)+','+parseInt(Math.random()*256)+')';
+							
+						}
+						
+						i=aLi.length-1;
+						
+						timer=setInterval(function(){
+							move(aLi[i],{width:100, height:100, opacity:1,left:aPos[i].left,top:aPos[i].top});
+							i--;
+							if(i==-1){
+								clearInterval(timer);	
+							}
+						},100);
+					}	
+				}});
+			})(i);
+			
+			i++;
+			if(i==aLi.length){
+				clearInterval(timer);	
+			}
+		},100);
+	};
+};
+</script>
+</head>
+
+<body>
+<input type="button" value="换一页" id="btn1">
+
+<ul id="ul1">
+	<li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
+</body>
+</html>

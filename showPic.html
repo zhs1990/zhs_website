@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>作品展示</title>
+<style>
+*{ margin:0; padding:0; list-style:none;}
+#box{ width:700px; height:358px; border:1px solid #000; margin:50px auto; position:relative; overflow:hidden;}
+#box ul{ position:absolute; left:0; top:50%; margin-top:-90px;}
+#box ul li{ width:260px; height:179px; float:left; padding:0 10px; position:relative;}
+#box ul li img{ width:260px; height:179px; position:absolute; left:0; top:0;}
+
+#box ul li span{ width:100%; height:100%; line-height:179px; text-align:center; font-size:100px; color:#000; z-index:2; position:absolute; left:0; top:0; font-weight:bold;}
+</style>
+<script>
+window.onload=function(){
+	var oBox=document.getElementById('box');
+	var oUl=oBox.children[0];
+	var aLi=oUl.getElementsByTagName('li');
+	var aImg=oUl.getElementsByTagName('img');
+	
+	/*//跟程序没有关系，只是为了看看
+	for(var i=0; i<aLi.length; i++){
+		var oSpan=document.createElement('span');
+		oSpan.innerHTML=i;
+		aLi[i].appendChild(oSpan);
+	}
+	var aSpan=oUl.getElementsByTagName('span');*/
+	
+	var divC=oBox.offsetWidth/2;
+	
+	//算ul的宽度
+	oUl.style.width=aLi.length*aLi[0].offsetWidth+'px';
+	
+	oUl.onmousedown=function(ev){
+		var oEvent=ev || event;
+		var disX=oEvent.clientX-oUl.offsetLeft;
+		
+		document.onmousemove=function(ev){
+			var oEvent=ev || event;
+			var l=oEvent.clientX-disX;
+			if(l>divC-(1-0.5)*aLi[0].offsetWidth){
+				l=divC-(1-0.5)*aLi[0].offsetWidth;	
+			}
+			if(l<divC-(aLi.length-0.5)*aLi[0].offsetWidth){
+				l=divC-(aLi.length-0.5)*aLi[0].offsetWidth;	
+			}
+			oUl.style.left=l+'px';
+			
+			//算
+			setSize();
+		};
+		document.onmouseup=function(){
+			document.onmousemove=null;
+			document.onmouseup=null;
+		};
+		return false;
+	};
+	
+	//让某个li居中
+	oUl.style.left=divC-(2-0.5)*aLi[0].offsetWidth+'px';
+	
+	setSize();
+	function setSize(){
+		for(var i=0; i<aLi.length; i++){
+			var c=Math.abs(divC-(aLi[i].offsetWidth/2+aLi[i].offsetLeft+oUl.offsetLeft));
+			
+			var scale=1-c/500;
+			scale<0.5 && (scale=0.5);
+			//aSpan[i].innerHTML=scale.toFixed(2);
+			
+			aImg[i].style.width=scale*520+'px';
+			aImg[i].style.height=scale*358+'px';
+			aImg[i].style.marginLeft=-(aImg[i].offsetWidth-260)/2+'px';
+			aImg[i].style.marginTop=-(aImg[i].offsetHeight-179)/2+'px';
+			aLi[i].style.zIndex=scale*100000;
+		}	
+	}
+};
+</script>
+</head>
+
+<body>
+<div id="box">
+	<ul>
+    	<li><img src="images/img5/1.jpg"></li>
+        <li><img src="images/img5/2.jpg"></li>
+        <li><img src="images/img5/3.jpg"></li>
+        <li><img src="images/img5/4.jpg"></li>
+        <li><img src="images/img5/5.jpg"></li>
+        <li><img src="images/img5/6.jpg"></li>
+        <li><img src="images/img5/7.jpg"></li>
+        <li><img src="images/img5/8.jpg"></li>
+    </ul>
+</div>
+</body>
+</html>

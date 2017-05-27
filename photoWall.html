@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>照片墙</title>
+<style>
+*{ margin:0; padding:0; list-style:none;}
+#ul1{ width:510px; margin:10px auto;}
+#ul1 li{ width:150px; height:150px; float:left; margin:10px;}
+.box{ border:2px dashed #f60;}
+
+body{ text-align:center;}
+</style>
+<script src="js/doMove.js"></script>
+<script>
+window.onload=function(){
+	var oUl=document.getElementById('ul1');
+	var aLi=oUl.children;
+	var oBtn=document.getElementById('btn1');
+	
+	var zIndex=1000;
+	//1. 布局转化
+	var aPos=[];
+	
+	//点击随机换
+	oBtn.onclick=function(){
+		//随机换
+		aPos.sort(function(){
+			return Math.random()-0.5;	
+		});
+		
+		for(var i=0; i<aLi.length; i++){
+			doMove(aLi[i],aPos[aLi[i].index]);
+		}
+	};
+	
+	for(var i=0; i<aLi.length; i++){
+		aPos[i]={left:aLi[i].offsetLeft, top:aLi[i].offsetTop};
+	}
+	for(var i=0; i<aLi.length; i++){
+		aLi[i].style.left=aPos[i].left+'px';
+		aLi[i].style.top=aPos[i].top+'px';
+		aLi[i].style.position='absolute';
+		aLi[i].style.margin=0;
+	}
+	//调用拖拽
+	for(var i=0; i<aLi.length; i++){
+		drag(aLi[i]);
+		aLi[i].index=i;
+	}
+	
+	
+	//拖拽
+	function drag(obj){
+		obj.onmousedown=function(ev){
+			var oEvent=ev || event;
+			var disX=oEvent.clientX-obj.offsetLeft;
+			var disY=oEvent.clientY-obj.offsetTop;
+			obj.style.zIndex=zIndex++;
+			clearInterval(obj.timer);
+			document.onmousemove=function(ev){
+				var oEvent=ev || event;
+				obj.style.left=oEvent.clientX-disX+'px';
+				obj.style.top=oEvent.clientY-disY+'px';
+				
+				for(var i=0; i<aLi.length; i++){
+					aLi[i].className='';
+				}
+				//检测
+				var oNear=findNearest(obj);
+				if(oNear){
+					oNear.className='box';	
+				}
+			};
+			document.onmouseup=function(){
+				document.onmousemove=null;
+				document.onmouseup=null;
+				obj.releaseCapture && obj.releaseCapture();
+				//换位置
+				var oNear=findNearest(obj);
+				if(oNear){
+					doMove(obj,aPos[oNear.index]);
+					doMove(oNear,aPos[obj.index]);
+					
+					oNear.className='';
+					
+					var tmp;
+					tmp=oNear.index;
+					oNear.index=obj.index;
+					obj.index=tmp;
+				}else{
+					doMove(obj,aPos[obj.index]);
+				}
+			};
+			obj.setCapture && obj.setCapture();
+			return false;
+		};	
+	}
+	//findNearest
+	function findNearest(obj){ //找最近的li
+		var iMin=new Date().getTime();
+		var iMinIndex=-1;
+		for(var i=0; i<aLi.length; i++){
+			if(obj==aLi[i])continue;
+			if(collTest(obj,aLi[i])){
+				//找最近的
+				var dis=getDis(obj,aLi[i]);
+				if(dis<iMin){
+					iMin=dis;	
+					iMinIndex=i;
+				}	
+			}
+		}
+		
+		if(iMinIndex==-1){
+			return null;
+		}else{
+			return aLi[iMinIndex];
+		}
+	}
+	
+	//碰撞检测函数
+	function collTest(obj,obj2){
+		var l1=obj.offsetLeft;
+		var r1=obj.offsetLeft+obj.offsetWidth;
+		var t1=obj.offsetTop;
+		var b1=obj.offsetTop+obj.offsetHeight;
+		
+		var l2=obj2.offsetLeft;
+		var r2=obj2.offsetLeft+obj2.offsetWidth;
+		var t2=obj2.offsetTop;
+		var b2=obj2.offsetTop+obj2.offsetHeight;
+		
+		if(r1<l2 || l1>r2 || b1<t2 || t1>b2){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	//求距离
+	function getDis(obj,obj2){
+		var a=obj2.offsetLeft-obj.offsetLeft;
+		var b=obj2.offsetTop-obj.offsetTop;
+		return Math.sqrt(a*a+b*b);	
+	}
+};
+</script>
+</head>
+
+<body>
+<input type="button" value="随机走一个" id="btn1">
+<ul id="ul1">
+	<li><img src="images/cat/1.jpg" width="150"></li>
+    <li><img src="images/cat/2.jpg" width="150"></li>
+    <li><img src="images/cat/3.jpg" width="150"></li>
+    <li><img src="images/cat/4.jpg" width="150"></li>
+    <li><img src="images/cat/5.jpg" width="150"></li>
+    <li><img src="images/cat/6.jpg" width="150"></li>
+    <li><img src="images/cat/7.jpg" width="150"></li>
+    <li><img src="images/cat/8.jpg" width="150"></li>
+    <li><img src="images/cat/9.jpg" width="150"></li>
+</ul>
+</body>
+</html>
